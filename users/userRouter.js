@@ -1,6 +1,6 @@
 const express = require('express');
 const userdb = require('./userDb.js');
-
+const postdb = require('../posts/postDb.js')
 const router = express.Router();
 
 // POST user
@@ -63,9 +63,25 @@ router.get('/:id', (req, res) => {
 
 });
 
-// router.get('/:id/posts', (req, res) => {
+//POST a post
 
-// });
+router.post('/:id/posts', (req, res) => {
+    const {id: user_id} = req.params;
+    const { text } = req.body;
+    if (!text) {
+        res.status(400).json({ errorMessage: "Please provide text for the post." })
+    } else {
+        postdb.insert({user_id, text})
+            .then(post => {
+                res.status(201).json(post);
+            })
+            .catch(err => {
+                console.log('error', err);
+                res.status(500).json({ error: "There was an error while saving the post to the database" })
+            })
+    }
+})
+
 
 
 //Delete user with specified id
