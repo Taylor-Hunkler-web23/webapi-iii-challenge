@@ -6,29 +6,29 @@ const router = express.Router();
 // POST user
 router.post('/', validateUser, (req, res) => {
 
-    const {name} = req.body;
-    
-        userdb.insert(req.body)
-            
-            .then(user => {
-                res.status(201).json(user);
-            })
-            .catch(err => {
-                console.log('error', err);
-                res.status(500).json({ error: "There was an error while saving the user to the database" })
-            })
-    
+    const { name } = req.body;
+
+    userdb.insert(req.body)
+
+        .then(user => {
+            res.status(201).json(user);
+        })
+        .catch(err => {
+            console.log('error', err);
+            res.status(500).json({ error: "There was an error while saving the user to the database" })
+        })
+
 })
 
 
 router.get('/:id/posts', (req, res) => {
-const id = req.params.id;
-userdb.getUserPosts(id)
-.then(user => res.status(200).json(user))
-.catch(error => {
-    console.log(error);
-    res.status(500).json({error: "The post information could not be retrieved"})
-})
+    const id = req.params.id;
+    userdb.getUserPosts(id)
+        .then(user => res.status(200).json(user))
+        .catch(error => {
+            console.log(error);
+            res.status(500).json({ error: "The post information could not be retrieved" })
+        })
 });
 
 //returns list of users
@@ -49,32 +49,30 @@ router.get('/', (req, res) => {
 router.get('/:id', validateUserId, (req, res) => {
     const id = req.params.id;
     userdb.getById(id)
-    .then(user =>{
-       
+        .then(user => {
+
             res.status(200).json(user);
-        
-    })
+
+        })
 
 
 });
 
 //POST a post
 
-router.post('/:id/posts', (req, res) => {
-    const {id: user_id} = req.params;
+router.post('/:id/posts', validatePost, (req, res) => {
+    const { id: user_id } = req.params;
     const { text } = req.body;
-    if (!text) {
-        res.status(400).json({ errorMessage: "Please provide text for the post." })
-    } else {
-        postdb.insert({user_id, text})
-            .then(post => {
-                res.status(201).json(post);
-            })
-            .catch(err => {
-                console.log('error', err);
-                res.status(500).json({ error: "There was an error while saving the post to the database" })
-            })
-    }
+
+    postdb.insert({ user_id, text })
+        .then(post => {
+            res.status(201).json(post);
+        })
+        .catch(err => {
+            console.log('error', err);
+            res.status(500).json({ error: "There was an error while saving the post to the database" })
+        })
+
 })
 
 
@@ -106,53 +104,59 @@ router.put('/:id', validateUserId, (req, res) => {
     const { name } = req.body;
 
 
-    
 
-        userdb.update(id, req.body)
 
-            .then(user => {
-            
-                    res.status(200).json(user);
-               
+    userdb.update(id, req.body)
 
-            })
-        
+        .then(user => {
+
+            res.status(200).json(user);
+
+
+        })
+
 });
 
 
 // //custom middleware
 
 function validateUserId(req, res, next) {
-    const {id} = req.params;
+    const { id } = req.params;
     userdb.getById(id)
-    .then(user =>{
-        if (user) {
-        
-            next()
-        }else{
-            res.status(404).json({message: "invalid user id"})
-        }
-    })
+        .then(user => {
+            if (user) {
+
+                next()
+            } else {
+                res.status(404).json({ message: "invalid user id" })
+            }
+        })
 
 };
 
 function validateUser(req, res, next) {
-    const { name} = req.body;
-    if (!name){
-        return res.status(400).json({message: "missing required name field"})
+    const { name } = req.body;
+    if (!name) {
+        return res.status(400).json({ message: "missing required name field" })
     }
-    
-    else if (!req.body){
-        return res.status(400).json({message: "missing required body"})
-    }else {
+
+    else if (!req.body) {
+        return res.status(400).json({ message: "missing required body" })
+    } else {
         next()
     }
 
 
 };
 
-// function validatePost(req, res, next) {
-
-// };
+function validatePost(req, res, next) {
+    const { id: user_id } = req.params;
+    const { text } = req.body;
+    if (!text) {
+        return res.status(400).json({ message: "missing required text field" })
+    } else {
+        next()
+    }
+};
 
 module.exports = router;
