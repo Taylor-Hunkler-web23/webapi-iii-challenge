@@ -106,7 +106,7 @@ router.delete('/:id', (req, res) => {
 
 
 //Update user
-router.put('/:id', (req, res) => {
+router.put('/:id', validateUserId, (req, res) => {
     const id = req.params.id;
     const { name } = req.body;
 
@@ -116,27 +116,30 @@ router.put('/:id', (req, res) => {
         userdb.update(id, req.body)
 
             .then(user => {
-                if (user) {
+            
                     res.status(200).json(user);
-                } else {
-                    res.status(404).json({ message: "The user with the specified ID does not exist." });
-                }
+               
 
             })
-            .catch(err => {
-                console.log('error', err);
-                res.status(404).json({ error: "The user could not be removed" })
-            })
-    
+        
 });
 
 
 // //custom middleware
 
-// function validateUserId(req, res, next) {
-    
+function validateUserId(req, res, next) {
+    const {id} = req.params;
+    userdb.getById(id)
+    .then(user =>{
+        if (user) {
+        
+            next()
+        }else{
+            res.status(404).json({message: "invalid user id"})
+        }
+    })
 
-// };
+};
 
 // function validateUser(req, res, next) {
 
