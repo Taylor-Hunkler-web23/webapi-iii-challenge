@@ -4,7 +4,7 @@ const postdb = require('../posts/postDb.js')
 const router = express.Router();
 
 // POST user
-router.post('/', (req, res) => {
+router.post('/', validateUser, (req, res) => {
 
     const {name} = req.body;
     
@@ -46,20 +46,15 @@ router.get('/', (req, res) => {
 });
 
 //returns user with specified id
-router.get('/:id', (req, res) => {
+router.get('/:id', validateUserId, (req, res) => {
     const id = req.params.id;
     userdb.getById(id)
     .then(user =>{
-        if (user) {
+       
             res.status(200).json(user);
-        }else{
-            res.status(404).json({ message:"The use with the specified id does not exist."})
-        }
+        
     })
-    .catch(err => {
-        console.log('error', err);
-        res.status(500).json({error: "The user information could not be retrieved."})
-    })
+
 
 });
 
@@ -141,9 +136,20 @@ function validateUserId(req, res, next) {
 
 };
 
-// function validateUser(req, res, next) {
+function validateUser(req, res, next) {
+    const { name} = req.body;
+    if (!name){
+        return res.status(400).json({message: "missing required name field"})
+    }
+    
+    else if (!req.body){
+        return res.status(400).json({message: "missing required body"})
+    }else {
+        next()
+    }
 
-// };
+
+};
 
 // function validatePost(req, res, next) {
 
