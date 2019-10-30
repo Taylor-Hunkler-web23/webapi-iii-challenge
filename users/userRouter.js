@@ -47,10 +47,8 @@ router.get('/:id', (req, res) => {
 
 // });
 
-// router.delete('/:id', (req, res) => {
 
-// });
-
+//Delete user with specified id
 router.delete('/:id', (req, res) => {
     const id = req.params.id;
     userdb.remove(id)
@@ -71,9 +69,31 @@ router.delete('/:id', (req, res) => {
 })
 
 
-// router.put('/:id', (req, res) => {
+//Update user
+router.put('/:id', (req, res) => {
+    const id = req.params.id;
+    const { name } = req.body;
 
-// });
+
+    
+
+        userdb.update(id, req.body)
+
+            .then(user => {
+                if (user) {
+                    res.status(200).json(user);
+                } else {
+                    res.status(404).json({ message: "The user with the specified ID does not exist." });
+                }
+
+            })
+            .catch(err => {
+                console.log('error', err);
+                res.status(404).json({ error: "The user could not be removed" })
+            })
+    
+});
+
 
 // //custom middleware
 
