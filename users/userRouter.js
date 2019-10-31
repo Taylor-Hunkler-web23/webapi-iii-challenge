@@ -78,18 +78,15 @@ router.post('/:id/posts', validatePost, (req, res) => {
 
 
 //Delete user with specified id
-router.delete('/:id', (req, res) => {
+router.delete('/:id', validateUserId, (req, res) => {
     const id = req.params.id;
     userdb.remove(id)
 
         .then(removed => {
-            if (removed) {
+           
                 res.status(200).json({ message: 'Deleted' });
 
-            } else {
-                res.status(404).json({ message: "The user with the specified ID does not exist." });
-            }
-
+          
         })
         .catch(err => {
             console.log('error', err);
